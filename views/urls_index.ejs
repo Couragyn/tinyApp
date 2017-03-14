@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <% include ./partials/__header %>
 </head>
 <body>
+    <% include partials/__header %>
     <% for (prop in urls) { %>
       <li> <%= urls[prop] %> - <%= prop %>  </li>
     <% }; %>
