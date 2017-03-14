@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TinyApp</title>
+</head>
+<body>
+    <% for (prop in urls) { %>
+      <li> <%= urls[prop] %> - <%= prop %>  </li>
+    <% }; %>
+    <a href="http://test.com">Shorten URL</a>
+</body>
+</html>
+
+<!-- A list or table of the URLs and their shortened forms.
+
+A link for shortening a new URL (this will be a dead link for now, that is it doesn't need to go anywhere since you'll be building its functionality later).
