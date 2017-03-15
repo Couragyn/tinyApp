@@ -4,7 +4,14 @@
 <head></head>
 </head>
 <body>
+  <ol>
     <% include partials/__header %>
-    <li> <%= shortURL %> - <%= urls[shortURL] %> </li>
+    <li> <%= shortURL %></li>
+    <form action="/urls/:id" method="POST">
+      <label for="longURL">Update URL:</label>
+      <input id="updateURL" type="text" name="update" value="<%= urls[shortURL] %>" style="width: 300px">
+      <input type="submit" value="Update">
+    </form>
+  </ol>
 </body>
 </html>

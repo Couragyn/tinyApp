@@ -6,15 +6,15 @@
 <body>
   <ol>
     <% include partials/__header %>
-    <% for (prop in urls) { %>
-      <li> <%= urls[prop] %> - <%= prop %>
-      <form action='/urls/<%= prop %>/delete' method='post'>
-        <button>Delete</button>
-      </form>
-      </li>
-    <% }; %>
+    <form action='/urls/<%= prop %>/delete' method='post'>
+      <% for (prop in urls) { %>
+        <li> <%= urls[prop] %> - <%= prop %>
+          <a href="urls/<%= prop %>">edit</a>
+            <button>Delete</button>
+        </li>
+      <% }; %>
+    </form>
   </ol>
-
-    <a href="urls/new">New shorten URL</a>
+  <a href="urls/new">New shorten URL</a>
 </body>
 </html>
