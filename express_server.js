@@ -37,8 +37,12 @@ app.get("/urls/new", (req, res) => {
 
 // gets page with individual entry info
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id, urls: urlDatabase };
-  res.render("urls_show", templateVars);
+  if (req.params.id in urlDatabase) {
+    let templateVars = { shortURL: req.params.id, urls: urlDatabase };
+    res.render("urls_show", templateVars);
+  }else {
+    res.end("There is no shortURL with that address. Please try again.");
+  }
 });
 
 // gets page with list of all entries
