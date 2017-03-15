@@ -1,2 +1,9 @@
 <!-- header partial -->
 <h1>Title</h1>
+
+<form action="/login" method="POST">
+  <label for="username">Login:</label>
+  <input id="username" type="text" name="username" placeholder="Enter Username">
+  <button>Submit</button>
+</form>
+In the _header.ejs partial of your app, create a <form> that POSTs to /login.

@@ -3,8 +3,10 @@ let express = require("express");
 let app = express();
 let PORT = process.env.PORT || 8080; // default port 8080
 const bodyParser = require("body-parser");
+let cookieParser = require('cookie-parser');
 
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
 app.set("view engine", "ejs")
 
 // object dict that can be edited / parsed
@@ -21,6 +23,12 @@ app.get("/", (req, res) => {
 // gets for urls in JSON format
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
+});
+
+app.post("/login", (req, res) => {
+  let uname = req.body.username;
+  res.cookie('username', uname);
+  res.redirect("/");
 });
 
 // generates new shortURL, adds new entry to dict, redirects to new entry
