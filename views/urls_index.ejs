@@ -4,10 +4,17 @@
 <head>
 </head>
 <body>
+  <ol>
     <% include partials/__header %>
     <% for (prop in urls) { %>
-      <li> <%= urls[prop] %> - <%= prop %>  </li>
+      <li> <%= urls[prop] %> - <%= prop %>
+      <form action='/urls/<%= prop %>/delete' method='post'>
+        <button>Delete</button>
+      </form>
+      </li>
     <% }; %>
+  </ol>
+
     <a href="urls/new">New shorten URL</a>
 </body>
 </html>

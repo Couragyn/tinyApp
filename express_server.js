@@ -35,6 +35,11 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+app.post("/urls/:id/delete", (req, res) => {
+  delete urlDatabase[req.params.id];
+  res.redirect("/urls");
+});
+
 // gets page with individual entry info
 app.get("/urls/:id", (req, res) => {
   if (req.params.id in urlDatabase) {
