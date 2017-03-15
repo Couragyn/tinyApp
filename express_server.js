@@ -1,58 +1,64 @@
-var express = require("express");
-var app = express();
-var PORT = process.env.PORT || 8080; // default port 8080
+// requirement and config variables
+let express = require("express");
+let app = express();
+let PORT = process.env.PORT || 8080; // default port 8080
 const bodyParser = require("body-parser");
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs")
 
-var urlDatabase = {
+// object dict that can be edited / parsed
+const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
+// gets default home view (will change in furute iterations)
 app.get("/", (req, res) => {
   res.end("Hello!");
 });
 
+// gets for urls in JSON format
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
+// generates new shortURL, adds new entry to dict, redirects to new entry
 app.post("/urls", (req, res) => {
   let tmpId = generateRandomString();
   urlDatabase[tmpId] = req.body.longURL;
-  console.log(urlDatabase);  // debug statement to see POST parameters
   res.redirect(`/urls/${tmpId}`);
 });
 
+// gets page for new url creation
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+// gets page with individual entry info
 app.get("/urls/:id", (req, res) => {
   let templateVars = { shortURL: req.params.id, urls: urlDatabase };
   res.render("urls_show", templateVars);
 });
 
+// gets page with list of all entries
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
-app.get("/hello", (req, res) => {
-  res.end("<html><body>Hello <b>World</b></body></html>\n");
-});
-
+// redirect to longURL when u/shortURL is typed. 301 code
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });
 
+// starts server
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
+//function to generate random string used in shortURL
 function generateRandomString() {
   const charset = "abcdefghijklmnopqrstuvwxyz0123456789";
   let rand = '';
