@@ -15,9 +15,22 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "asd"
+  },
+ "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "asd"
+  }
+};
+
 // gets default home view (will change in furute iterations)
 app.get("/", (req, res) => {
-  res.end("Hello!");
+  res.redirect("/urls");
 });
 
 // gets for urls in JSON format
@@ -36,6 +49,22 @@ app.post("/logout", (req, res) => {
   res.redirect("/");
 });
 
+app.get("/register", (req, res) => {
+  res.render("register");
+})
+
+app.post("/register", (req, res) => {
+  let rndId = generateRandomString();
+  let newUser = {
+    id: rndId,
+    email: req.body.email,
+    password: req.body.password
+  };
+  users[rndId] = newUser;
+  console.log(users);
+  res.redirect("/");
+})
+
 // gets page for new url creation
 app.get("/urls/new", (req, res) => {
   let templateVars = { 'username': req.cookies["username"]};
@@ -44,9 +73,9 @@ app.get("/urls/new", (req, res) => {
 
 // generates new shortURL, adds new entry to dict, redirects to new entry
 app.post("/urls", (req, res) => {
-  let tmpId = generateRandomString();
-  urlDatabase[tmpId] = req.body.longURL;
-  res.redirect(`/urls/${tmpId}`);
+  let rndId = generateRandomString();
+  urlDatabase[rndId] = req.body.longURL;
+  res.redirect(`/urls/${rndId}`);
 });
 
 app.post("/urls/:id/delete", (req, res) => {
