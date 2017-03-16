@@ -51,19 +51,34 @@ app.post("/logout", (req, res) => {
 
 app.get("/register", (req, res) => {
   res.render("register");
-})
+});
 
 app.post("/register", (req, res) => {
-  let rndId = generateRandomString();
-  let newUser = {
-    id: rndId,
-    email: req.body.email,
-    password: req.body.password
-  };
-  users[rndId] = newUser;
-  console.log(users);
-  res.redirect("/");
-})
+  for (user in users) {
+    let innerDb = users[user];
+    if (innerDb['email'] === req.body.email){
+      console.log('taken');
+    }
+      // if (user.email == req.body.email){
+      //   console.log('nah');
+      // }
+      // res.status(400).send('There is already an account with that email');
+  }
+  if (!req.body.email || !req.body.password) {
+    res.status(400).send('Enter both email and password fields');
+  } else {
+    let rndId = generateRandomString();
+    let newUser = {
+      id: rndId,
+      email: req.body.email,
+      password: req.body.password
+    };
+    users[rndId] = newUser;
+    res.cookie("user_id", rndId);
+    console.log("===============");
+    res.redirect("/");
+  }
+});
 
 // gets page for new url creation
 app.get("/urls/new", (req, res) => {
