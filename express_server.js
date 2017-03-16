@@ -44,6 +44,10 @@ app.post("/login", (req, res) => {
   res.redirect("/");
 });
 
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+
 app.post("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect("/");
@@ -57,12 +61,8 @@ app.post("/register", (req, res) => {
   for (user in users) {
     let innerDb = users[user];
     if (innerDb['email'] === req.body.email){
-      console.log('taken');
+      res.status(400).send('There is already an account with that email');
     }
-      // if (user.email == req.body.email){
-      //   console.log('nah');
-      // }
-      // res.status(400).send('There is already an account with that email');
   }
   if (!req.body.email || !req.body.password) {
     res.status(400).send('Enter both email and password fields');
@@ -75,14 +75,13 @@ app.post("/register", (req, res) => {
     };
     users[rndId] = newUser;
     res.cookie("user_id", rndId);
-    console.log("===============");
     res.redirect("/");
   }
 });
 
 // gets page for new url creation
 app.get("/urls/new", (req, res) => {
-  let templateVars = { 'username': req.cookies["username"]};
+  let templateVars = { 'user': users[req.cookies["user_id"]]};
   res.render("urls_new", templateVars);
 });
 
@@ -101,8 +100,9 @@ app.post("/urls/:id/delete", (req, res) => {
 // gets page with individual entry info
 app.get("/urls/:id", (req, res) => {
   if (req.params.id in urlDatabase) {
-    let templateVars = { 'username': req.cookies["username"],
+    let templateVars = { 'user': users[req.cookies["user_id"]],
       shortURL: req.params.id, urls: urlDatabase };
+      console.log(templateVars);
     res.render("urls_show", templateVars);
   }else {
     res.end("There is no shortURL with that address. Please try again.");
@@ -111,7 +111,7 @@ app.get("/urls/:id", (req, res) => {
 
 // gets page with list of all entries
 app.get("/urls", (req, res) => {
-  let templateVars = { 'username': req.cookies["username"],
+  let templateVars = { 'user': users[req.cookies["user_id"]],
     urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
