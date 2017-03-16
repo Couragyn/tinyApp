@@ -39,9 +39,26 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  let uname = req.body.username;
-  res.cookie('username', uname);
-  res.redirect("/");
+  let emailSwitch = 0;
+  let userId = '';
+  for (user in users) {
+    let innerDb = users[user];
+    console.log(innerDb);
+    if (req.body.email === innerDb.email){
+      if (req.body.password !== innerDb.password){
+        res.status(403).send('Incorrect Password');
+      }
+      emailSwitch = 1;
+      userId = innerDb.id;
+      break;
+    }
+  }
+  if (emailSwitch === 0) {
+    res.status(403).send('No account with that Email');
+  } else {
+    res.cookie("user_id", userId);
+    res.redirect("/");
+  }
 });
 
 app.get("/login", (req, res) => {
