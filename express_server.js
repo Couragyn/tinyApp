@@ -31,16 +31,22 @@ app.post("/login", (req, res) => {
   res.redirect("/");
 });
 
+app.post("/logout", (req, res) => {
+  res.clearCookie('username');
+  res.redirect("/");
+});
+
+// gets page for new url creation
+app.get("/urls/new", (req, res) => {
+  let templateVars = { 'username': req.cookies["username"]};
+  res.render("urls_new", templateVars);
+});
+
 // generates new shortURL, adds new entry to dict, redirects to new entry
 app.post("/urls", (req, res) => {
   let tmpId = generateRandomString();
   urlDatabase[tmpId] = req.body.longURL;
   res.redirect(`/urls/${tmpId}`);
-});
-
-// gets page for new url creation
-app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
 });
 
 app.post("/urls/:id/delete", (req, res) => {
@@ -51,7 +57,8 @@ app.post("/urls/:id/delete", (req, res) => {
 // gets page with individual entry info
 app.get("/urls/:id", (req, res) => {
   if (req.params.id in urlDatabase) {
-    let templateVars = { shortURL: req.params.id, urls: urlDatabase };
+    let templateVars = { 'username': req.cookies["username"],
+      shortURL: req.params.id, urls: urlDatabase };
     res.render("urls_show", templateVars);
   }else {
     res.end("There is no shortURL with that address. Please try again.");
@@ -60,7 +67,8 @@ app.get("/urls/:id", (req, res) => {
 
 // gets page with list of all entries
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = { 'username': req.cookies["username"],
+    urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 

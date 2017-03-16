@@ -1,9 +1,16 @@
 <!-- header partial -->
 <h1>Title</h1>
 
-<form action="/login" method="POST">
-  <label for="username">Login:</label>
-  <input id="username" type="text" name="username" placeholder="Enter Username">
-  <button>Submit</button>
-</form>
-In the _header.ejs partial of your app, create a <form> that POSTs to /login.
+<% if (username) { %>
+  <h3>Welcome <%= username %> </h3>
+  <form action="/logout" method="POST">
+    <button>Logout</button>
+  </form>
+<% } else { %>
+  <form action="/login" method="POST">
+    <label for="username">Login:</label>
+    <input id="username" type="text" name="username" placeholder="Enter Username">
+    <button>Submit</button>
+  </form>
+<%}%>
+  <% console.log(username); %>
