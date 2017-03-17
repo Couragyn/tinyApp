@@ -117,7 +117,7 @@ app.get("/urls", (req, res) => {
       users: users,
       urls: urlDatabase
     };
-    res.status(200).render("urls_index", templateVars);
+    res.render("urls_index", templateVars);
   } else {
     res.status(401).send('Error 401: You need to <a href=/login>login</a>');
   }
