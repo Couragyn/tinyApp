@@ -4,14 +4,21 @@
 <head></head>
 </head>
 <body>
-  <ol>
     <% include partials/__header %>
-    <li name="shortURL"><%= shortURL %></li>
-    <form action="/urls/<%= shortURL %>" method="POST">
-      <label for="updateURL">Update URL:</label>
-      <input id="updateURL" type="text" name="update" value="<%= urls[shortURL].longURL %>" style="width: 300px">
-      <input type="submit" value="Update">
-    </form>
-  </ol>
+    <h1><%= shortURL %></h1>
+    <table style="width:100%">
+    <td name="shortURL"><%= shortURL %></td>
+    <td>
+      <form action="/urls/<%= shortURL %>" method="POST">
+        <label for="updateURL">Update URL:</label>
+        <input id="updateURL" type="text" name="update" value="<%= urls[shortURL].longURL %>" style="width: 300px">
+        <input type="submit" value="Update">
+      </form>
+    </td>
+    <td>
+      <form action='/urls/<%= shortURL %>/delete' method='POST'>
+        <button>Delete</button>
+      </form>
+    </td>
 </body>
 </html>

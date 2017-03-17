@@ -3,21 +3,25 @@
 <html lang="en">
 <head>
 </head>
-<body>
-  <ol>
-    <h1>URL List</h1>
-    <% include partials/__header %>
+  <body>
+  <% include partials/__header %>
+  <h1>URL List</h1>
+  <table style="width:100%">
     <% for (prop in urls) { %>
       <% if (user === urls[prop].user_id) { %>
-        <li> <%= urls[prop].longURL %> - <%= prop %>
-          <a href="urls/<%= prop %>">edit</a>
-            <form action='/urls/<%= prop %>/delete' method='post'>
+        <tr>
+          <td><%= prop%></td>
+          <td><%= urls[prop].longURL %></td>
+          <td><a href="urls/<%= prop %>">Edit</a></td>
+          <td>
+            <form action='/urls/<%= prop %>/delete' method='POST'>
               <button>Delete</button>
             </form>
-        </li>
+          </td>
+        </tr>
       <% }; %>
     <% }; %>
-  </ol>
-    <a href="./urls/new">New shorten URL</a>
-</body>
+  </table>
+  <a href="./urls/new">Create a New Short Link</a>
+  </body>
 </html>

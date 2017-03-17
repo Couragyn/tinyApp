@@ -20,12 +20,11 @@ const users = {};
 
 // gets default home view (will change in furute iterations)
 app.get("/", (req, res) => {
-  res.redirect("/urls");
-});
-
-// gets for urls in JSON format
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
+  if (req.session.user_id){
+    res.redirect('/urls');
+  } else {
+    res.redirect('/login');
+  }
 });
 
 app.post("/login", (req, res) => {
@@ -52,7 +51,9 @@ app.post("/login", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  res.render("login");
+    let templateVars = { user: req.session.user_id,
+      users: users };
+  res.render("login", templateVars);
 });
 
 app.get("/logout", (req, res) => {
@@ -61,7 +62,9 @@ app.get("/logout", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  res.render("register");
+    let templateVars = { user: req.session.user_id,
+      users: users };
+  res.render("register", templateVars);
 });
 
 app.post("/register", (req, res) => {
@@ -91,31 +94,36 @@ app.post("/register", (req, res) => {
 // gets page for new url creation
 app.get("/urls/new", (req, res) => {
   if (req.session.user_id){
-    let templateVars = { 'user': req.session.user_id};
+    let templateVars = { 'user': req.session.user_id,
+    users: users };
     res.render("urls_new", templateVars);
   } else {
-    res.redirect('/login');
+    res.status(401).send('You need to <a href=/login>login</a>');
+  }
+});
+
+// gets page with list of all entries
+app.get("/urls", (req, res) => {
+  if (req.session.user_id){
+    let templateVars = { user: req.session.user_id,
+      users: users,
+      urls: urlDatabase
+    };
+    res.status(200).render("urls_index", templateVars);
+  } else {
+    res.status(401).send('You need to <a href=/login>login</a>');
   }
 });
 
 // generates new shortURL, adds new entry to dict, redirects to new entry
 app.post("/urls", (req, res) => {
   let rndId = generateRandomString();
-  let userCookie = req.session.user_id;
   urlDatabase[rndId] = {
     id: "rndId",
     user_id: req.session.user_id,
     longURL: req.body.longURL
   }
   res.redirect(`/urls`);
-});
-
-// gets page with list of all entries
-app.get("/urls", (req, res) => {
-  let templateVars = { user: req.session.user_id,
-    test: 'yo',
-    urls: urlDatabase };
-  res.render("urls_index", templateVars);
 });
 
 app.post("/urls/:id/delete", (req, res) => {
@@ -129,12 +137,22 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // gets page with individual entry info
 app.get("/urls/:id", (req, res) => {
-  if (req.params.id in urlDatabase) {
-    let templateVars = { user: req.session.user_id,
-      shortURL: req.params.id, urls: urlDatabase };
-    res.render("urls_show", templateVars);
-  }else {
-    res.end("There is no shortURL with that address. Please try again.");
+  if (req.session.user_id){
+    if (req.params.id in urlDatabase) {
+      if (req.session.user_id === urlDatabase[req.params.id].user_id) {
+        let templateVars = { user: req.session.user_id,
+          users: users,
+          shortURL: req.params.id,
+          urls: urlDatabase };
+        res.render("urls_show", templateVars);
+      }else {
+        res.status(403).send('You do not own this URL');
+      }
+    } else {
+      res.status(404).send('URL not found');
+    }
+  } else {
+    res.status(401).send('You need to <a href=/login>login</a>');
   }
 });
 

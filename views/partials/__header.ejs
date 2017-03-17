@@ -1,4 +1,10 @@
 <!-- header partial -->
-<a href="/login">Login</a>
-<a href="/register">Register</a>
-<a href="/logout">Logout</a>
+
+<% if (user) { %>
+  <h4><%= users[user].email %></h4>
+  <a href="/urls">My Links</a>
+  <a href="/logout">Logout</a>
+<% } else { %>
+  <a href="/login">Login</a>
+  <a href="/register">Register</a>
+<% } %>
