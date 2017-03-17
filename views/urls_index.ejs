@@ -8,10 +8,11 @@
     <h1>URL List</h1>
     <% include partials/__header %>
     <% for (prop in urls) { %>
-    <form action='/urls/<%= prop %>/delete' method='post'>
         <li> <%= urls[prop].longURL %> - <%= prop %>
           <a href="urls/<%= prop %>">edit</a>
-            <button>Delete</button>
+            <form action='/urls/<%= prop %>/delete' method='post'>
+              <button>Delete</button>
+            </form>
         </li>
     </form>
 

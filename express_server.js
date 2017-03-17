@@ -13,7 +13,7 @@ app.set("view engine", "ejs")
 const urlDatabase = {
   "b2xVn2": {
     id: "b2xVn2",
-    user_id: "b2xVn2",
+    user_id: "123456",
     longURL: "http://www.lighthouselabs.ca"
   },
   "9sm5xK": {
@@ -126,7 +126,11 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-  delete urlDatabase[req.params.id];
+  if (req.cookies.user_id === urlDatabase[req.params.id].user_id) {
+    delete urlDatabase[req.params.id];
+  } else {
+    res.status(401).send('Cannot delete URL you did not create');
+  }
   res.redirect("/urls");
 });
 
@@ -139,6 +143,16 @@ app.get("/urls/:id", (req, res) => {
   }else {
     res.end("There is no shortURL with that address. Please try again.");
   }
+});
+
+// gets page with individual entry info
+app.post("/urls/:id", (req, res) => {
+if (req.cookies.user_id === urlDatabase[req.params.id].user_id) {
+    urlDatabase[req.params.id].longURL = req.body.update;
+  } else {
+    res.status(401).send('Cannot edit a URL you did not create');
+  }
+  res.redirect("/urls");
 });
 
 // gets page with list of all entries
