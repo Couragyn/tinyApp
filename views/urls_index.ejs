@@ -8,7 +8,7 @@
     <h1>URL List</h1>
     <% include partials/__header %>
     <% for (prop in urls) { %>
-      <% if (user.id ===  urls[prop].user_id) { %>
+      <% if (user === urls[prop].user_id) { %>
         <li> <%= urls[prop].longURL %> - <%= prop %>
           <a href="urls/<%= prop %>">edit</a>
             <form action='/urls/<%= prop %>/delete' method='post'>
