@@ -137,7 +137,7 @@ app.post("/urls/:id/delete", (req, res) => {
 // gets page with individual entry info
 app.get("/urls/:id", (req, res) => {
   if (req.params.id in urlDatabase) {
-    let templateVars = { 'user': users[req.cookies["user_id"]],
+    let templateVars = { user: users[req.cookies["user_id"]],
       shortURL: req.params.id, urls: urlDatabase };
     res.render("urls_show", templateVars);
   }else {
@@ -157,7 +157,8 @@ if (req.cookies.user_id === urlDatabase[req.params.id].user_id) {
 
 // gets page with list of all entries
 app.get("/urls", (req, res) => {
-  let templateVars = { 'user': users[req.cookies["user_id"]],
+  let templateVars = { user: users[req.cookies["user_id"]],
+    test: 'yo',
     urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
