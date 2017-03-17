@@ -3,39 +3,20 @@ let express = require("express");
 let app = express();
 let PORT = process.env.PORT || 8080; // default port 8080
 const bodyParser = require("body-parser");
-let cookieParser = require('cookie-parser');
+var cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
 
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
 app.set("view engine", "ejs")
 
-// object dict that can be edited / parsed
-const urlDatabase = {
-  "b2xVn2": {
-    id: "b2xVn2",
-    user_id: "123456",
-    longURL: "http://www.lighthouselabs.ca"
-  },
-  "9sm5xK": {
-    id: "9sm5xK",
-    user_id: "qwerty",
-    longURL: "http://www.google.com"
-  }
-};
+app.use(cookieSession({
+  name: 'session',
+  keys: ["Development"]
+}));
 
-const users = {
-  "123456": {
-    id: "123456",
-    email: "user@example.com",
-    password: "asd"
-  },
- "qwerty": {
-    id: "qwerty",
-    email: "user2@example.com",
-    password: "asd"
-  }
-};
+// object dict for users and the  links they create
+const urlDatabase = {};
+const users = {};
 
 // gets default home view (will change in furute iterations)
 app.get("/", (req, res) => {
@@ -65,7 +46,7 @@ app.post("/login", (req, res) => {
   if (emailSwitch === 0 || passSwitch === 0) {
     res.status(403).send('Login error');
   } else {
-    res.cookie("user_id", userId);
+    req.session.user_id = userId;
     res.redirect("/");
   }
 });
@@ -75,7 +56,7 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/logout", (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect("/");
 });
 
@@ -102,15 +83,15 @@ app.post("/register", (req, res) => {
       password: hashed_password
     };
     users[rndId] = newUser;
-    res.cookie("user_id", rndId);
+    req.session.user_id = rndId;
     res.redirect("/");
   }
 });
 
 // gets page for new url creation
 app.get("/urls/new", (req, res) => {
-  if (req.cookies.user_id){
-    let templateVars = { 'user': req.cookies["user_id"]};
+  if (req.session.user_id){
+    let templateVars = { 'user': req.session.user_id};
     res.render("urls_new", templateVars);
   } else {
     res.redirect('/login');
@@ -120,25 +101,25 @@ app.get("/urls/new", (req, res) => {
 // generates new shortURL, adds new entry to dict, redirects to new entry
 app.post("/urls", (req, res) => {
   let rndId = generateRandomString();
-  let userCookie = req.cookies.user_id;
+  let userCookie = req.session.user_id;
   urlDatabase[rndId] = {
     id: "rndId",
-    user_id: req.cookies.user_id,
+    user_id: req.session.user_id,
     longURL: req.body.longURL
   }
-  res.redirect(`/urls/${rndId}`);
+  res.redirect(`/urls`);
 });
 
 // gets page with list of all entries
 app.get("/urls", (req, res) => {
-  let templateVars = { user: req.cookies["user_id"],
+  let templateVars = { user: req.session.user_id,
     test: 'yo',
     urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-  if (req.cookies.user_id === urlDatabase[req.params.id].user_id) {
+  if (req.session.user_id === urlDatabase[req.params.id].user_id) {
     delete urlDatabase[req.params.id];
   } else {
     res.status(401).send('Cannot delete URL you did not create');
@@ -149,7 +130,7 @@ app.post("/urls/:id/delete", (req, res) => {
 // gets page with individual entry info
 app.get("/urls/:id", (req, res) => {
   if (req.params.id in urlDatabase) {
-    let templateVars = { user: req.cookies["user_id"],
+    let templateVars = { user: req.session.user_id,
       shortURL: req.params.id, urls: urlDatabase };
     res.render("urls_show", templateVars);
   }else {
@@ -159,7 +140,7 @@ app.get("/urls/:id", (req, res) => {
 
 // gets page with individual entry info
 app.post("/urls/:id", (req, res) => {
-if (req.cookies.user_id === urlDatabase[req.params.id].user_id) {
+if (req.session.user_id === urlDatabase[req.params.id].user_id) {
     urlDatabase[req.params.id].longURL = req.body.update;
   } else {
     res.status(401).send('Cannot edit a URL you did not create');
