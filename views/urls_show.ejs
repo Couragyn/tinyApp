@@ -9,7 +9,7 @@
     <li> <%= shortURL %></li>
     <form action="/urls/:id" method="POST">
       <label for="updateURL">Update URL:</label>
-      <input id="updateURL" type="text" name="update" value="<%= urls[shortURL] %>" style="width: 300px">
+      <input id="updateURL" type="text" name="update" value="<%= urls[shortURL].longURL %>" style="width: 300px">
       <input type="submit" value="Update">
     </form>
   </ol>

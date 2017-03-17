@@ -11,18 +11,26 @@ app.set("view engine", "ejs")
 
 // object dict that can be edited / parsed
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {
+    id: "b2xVn2",
+    user_id: "b2xVn2",
+    longURL: "http://www.lighthouselabs.ca"
+  },
+  "9sm5xK": {
+    id: "9sm5xK",
+    user_id: "qwerty",
+    longURL: "http://www.google.com"
+  }
 };
 
 const users = {
-  "userRandomID": {
-    id: "userRandomID",
+  "123456": {
+    id: "123456",
     email: "user@example.com",
     password: "asd"
   },
- "user2RandomID": {
-    id: "user2RandomID",
+ "qwerty": {
+    id: "qwerty",
     email: "user2@example.com",
     password: "asd"
   }
@@ -43,7 +51,6 @@ app.post("/login", (req, res) => {
   let userId = '';
   for (user in users) {
     let innerDb = users[user];
-    console.log(innerDb);
     if (req.body.email === innerDb.email){
       if (req.body.password !== innerDb.password){
         res.status(403).send('Incorrect Password');
@@ -102,14 +109,19 @@ app.get("/urls/new", (req, res) => {
     let templateVars = { 'user': users[req.cookies["user_id"]]};
     res.render("urls_new", templateVars);
   } else {
-    res.redirect('/');
+    res.redirect('/login');
   }
 });
 
 // generates new shortURL, adds new entry to dict, redirects to new entry
 app.post("/urls", (req, res) => {
   let rndId = generateRandomString();
-  urlDatabase[rndId] = req.body.longURL;
+  let userCookie = req.cookies.user_id;
+  urlDatabase[rndId] = {
+    id: "rndId",
+    user_id: req.cookies.user_id,
+    longURL: req.body.longURL
+  }
   res.redirect(`/urls/${rndId}`);
 });
 
@@ -123,7 +135,6 @@ app.get("/urls/:id", (req, res) => {
   if (req.params.id in urlDatabase) {
     let templateVars = { 'user': users[req.cookies["user_id"]],
       shortURL: req.params.id, urls: urlDatabase };
-      console.log(templateVars);
     res.render("urls_show", templateVars);
   }else {
     res.end("There is no shortURL with that address. Please try again.");
@@ -137,7 +148,7 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-// redirect to longURL when u/shortURL is typed. 301 code
+// redirect to longURL when u/shortURL is typed.
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);

@@ -9,7 +9,7 @@
     <% include partials/__header %>
     <% for (prop in urls) { %>
     <form action='/urls/<%= prop %>/delete' method='post'>
-        <li> <%= urls[prop] %> - <%= prop %>
+        <li> <%= urls[prop].longURL %> - <%= prop %>
           <a href="urls/<%= prop %>">edit</a>
             <button>Delete</button>
         </li>
