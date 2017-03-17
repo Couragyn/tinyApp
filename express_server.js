@@ -43,7 +43,7 @@ app.post("/login", (req, res) => {
     }
   }
   if (emailSwitch === 0 || passSwitch === 0) {
-    res.status(403).send('Login error');
+    res.status(403).send('Error 403: Login error');
   } else {
     req.session.user_id = userId;
     res.redirect("/");
@@ -51,9 +51,13 @@ app.post("/login", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
+  if (req.session.user_id){
+    res.redirect("/");
+  } else {
     let templateVars = { user: req.session.user_id,
       users: users };
-  res.render("login", templateVars);
+    res.render("login", templateVars);
+  }
 });
 
 app.get("/logout", (req, res) => {
@@ -62,20 +66,24 @@ app.get("/logout", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
+  if (req.session.user_id){
+    res.redirect("/");
+  } else {
     let templateVars = { user: req.session.user_id,
       users: users };
-  res.render("register", templateVars);
+    res.render("register", templateVars);
+  }
 });
 
 app.post("/register", (req, res) => {
   for (user in users) {
     let innerDb = users[user];
     if (innerDb['email'] === req.body.email){
-      res.status(400).send('Login error');
+      res.status(400).send('Error 400: Email already exists');
     }
   }
   if (!req.body.email || !req.body.password) {
-    res.status(400).send('Login error');
+    res.status(400).send('Error 400: Register error');
   } else {
     let rndId = generateRandomString();
     const password = req.body.password;
@@ -98,7 +106,7 @@ app.get("/urls/new", (req, res) => {
     users: users };
     res.render("urls_new", templateVars);
   } else {
-    res.status(401).send('You need to <a href=/login>login</a>');
+    res.status(401).send('Error 401: You need to <a href=/login>login</a>');
   }
 });
 
@@ -111,26 +119,30 @@ app.get("/urls", (req, res) => {
     };
     res.status(200).render("urls_index", templateVars);
   } else {
-    res.status(401).send('You need to <a href=/login>login</a>');
+    res.status(401).send('Error 401: You need to <a href=/login>login</a>');
   }
 });
 
 // generates new shortURL, adds new entry to dict, redirects to new entry
 app.post("/urls", (req, res) => {
-  let rndId = generateRandomString();
-  urlDatabase[rndId] = {
-    id: "rndId",
-    user_id: req.session.user_id,
-    longURL: req.body.longURL
+  if (req.session.user_id){
+    let rndId = generateRandomString();
+    urlDatabase[rndId] = {
+      id: "rndId",
+      user_id: req.session.user_id,
+      longURL: req.body.longURL
+    }
+    res.redirect('/urls/'+rndId);
+  } else {
+    res.status(401).send('Error 401: You need to <a href=/login>login</a>');
   }
-  res.redirect(`/urls`);
 });
 
 app.post("/urls/:id/delete", (req, res) => {
   if (req.session.user_id === urlDatabase[req.params.id].user_id) {
     delete urlDatabase[req.params.id];
   } else {
-    res.status(401).send('Cannot delete URL you did not create');
+    res.status(401).send('Error 401: Cannot delete URL you did not create');
   }
   res.redirect("/urls");
 });
@@ -146,24 +158,32 @@ app.get("/urls/:id", (req, res) => {
           urls: urlDatabase };
         res.render("urls_show", templateVars);
       }else {
-        res.status(403).send('You do not own this URL');
+        res.status(403).send('Error 403: You do not own this URL');
       }
     } else {
-      res.status(404).send('URL not found');
+      res.status(404).send('Error 404: URL not found');
     }
   } else {
-    res.status(401).send('You need to <a href=/login>login</a>');
+    res.status(401).send('Error 401: You need to <a href=/login>login</a>');
   }
 });
 
 // gets page with individual entry info
 app.post("/urls/:id", (req, res) => {
-if (req.session.user_id === urlDatabase[req.params.id].user_id) {
-    urlDatabase[req.params.id].longURL = req.body.update;
+  if (req.session.user_id){
+    if (req.params.id in urlDatabase) {
+      if (req.session.user_id === urlDatabase[req.params.id].user_id) {
+        urlDatabase[req.params.id].longURL = req.body.update;
+        res.redirect("/urls/" + req.params.id);
+      }else {
+        res.status(403).send('Error 403: You do not own this URL');
+      }
+    } else {
+      res.status(404).send('Error 404: URL not found');
+    }
   } else {
-    res.status(401).send('Cannot edit a URL you did not create');
+    res.status(401).send('Error 401: You need to <a href=/login>login</a>');
   }
-  res.redirect("/urls");
 });
 
 // redirect to longURL when u/shortURL is typed.
